@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Reddit Subfilter
 // @namespace    tatu.reddit-subfilter
-// @version      1.7.1
+// @version      1.8.0
 // @description  Piilota subredditit yhdellä napautuksella. Estolista synkronoituu laitteiden välillä oman yksityisen subredditin wikisivun kautta.
 // @match        https://www.reddit.com/*
 // @match        https://reddit.com/*
@@ -14,6 +14,8 @@
 // @grant        GM_xmlhttpRequest
 // @connect      old.reddit.com
 // @run-at       document-start
+// @updateURL    https://raw.githubusercontent.com/tatu-puu/reddit-subfilter/main/reddit-subfilter.user.js
+// @downloadURL  https://raw.githubusercontent.com/tatu-puu/reddit-subfilter/main/reddit-subfilter.user.js
 // ==/UserScript==
 
 (function () {
@@ -340,6 +342,10 @@
     .rsf-diag button { background: #333; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; margin-right: 8px; font: 600 13px sans-serif; }
     .rsf-toast { top: 16px; bottom: auto !important; }
     .rsf-toast button { background: none; border: none; color: #7ab8ff; font: 700 14px sans-serif; cursor: pointer; }
+
+    /* "Avaa sovelluksessa" -popup: Reddit lukitsee scrollauksen sen alla, siksi overflow pakotetaan auki */
+    #xpromo-bottom-sheet, [id^="xpromo-"], .rpl-bottom-sheet { display: none !important; }
+    body.rpl-scroll-lock, body.scroll-disabled, html.rpl-scroll-lock, html.scroll-disabled { overflow: auto !important; }
   `;
   const addStyle = () => {
     if (document.getElementById('rsf-style')) return;
@@ -634,7 +640,19 @@
     renderPanel();
   }
 
+  // ---------- "Avaa sovelluksessa" -popup ----------
+  // Reddit näyttää ajoittain koko ruudun popupin, joka kehottaa avaamaan sovelluksen, ja lukitsee
+  // samalla scrollauksen luokalla bodyssa/htmlissa. Popup itse piilotetaan CSS:llä (yllä), mutta
+  // lukitusluokat pitää myös poistaa, koska Reddit tarkistaa ja lisää niitä JS:llä uudelleen.
+  const SCROLL_LOCK_CLASSES = ['rpl-scroll-lock', 'scroll-disabled', 'm-blurred'];
+  function removeAppPromo(root = document) {
+    root.querySelectorAll('#xpromo-bottom-sheet, [id^="xpromo-"], .rpl-bottom-sheet').forEach((el) => el.remove());
+    document.body?.classList.remove(...SCROLL_LOCK_CLASSES);
+    document.documentElement?.classList.remove(...SCROLL_LOCK_CLASSES);
+  }
+
   function process(root = document) {
+    removeAppPromo(root);
     processAds(root);
     // Sivukohtainen poikkeus: jos avaat suoraan estetyn subin, sitä ei piiloteta
     const here = location.pathname.match(/^\/r\/([^/]+)/);

@@ -2,7 +2,7 @@
 
 Userscript, joka piilottaa ei-toivotut subredditit ja mainokset Redditistä. Toimii koneella (Chrome/Firefox) ja Androidilla (Firefox) Violentmonkeyn kautta. Estolista synkronoituu laitteiden välillä oman yksityisen subredditin wikisivun kautta.
 
-Nykyinen versio: **1.7.1**, tiedosto `reddit-subfilter.user.js`.
+Nykyinen versio: **1.8.0**, tiedosto `reddit-subfilter.user.js`.
 
 ## Ominaisuudet
 
@@ -12,12 +12,23 @@ Nykyinen versio: **1.7.1**, tiedosto `reddit-subfilter.user.js`.
 - Laskuripaneeli oikeassa alakulmassa näyttää piilotetut subit tältä kerralta ja kaikkiaan. Tilarivillä näkyvät synkkauksen tila ja mainosten määrä.
 - Asetukset ovat paneelissa: synkkaus-subreddit, suodattimen lisäys, koko listan muokkaus ja vianetsintä.
 - Jos avaat estetyn subin suoraan, se näkyy normaalisti.
+- Piilottaa Redditin "Avaa sovelluksessa" -popupin ja poistaa sen mukana tulevan scroll-lukituksen.
 
 ## Asennus
 
 1. Asenna Violentmonkey: koneella Chrome/Firefox, Androidilla Firefox (Lisäosat).
 2. Lisää skripti Violentmonkeyyn.
 3. **Päivittäessä korvaa vanhan skriptin sisältö.** Älä lisää uutta skriptiä, koska jokaisella kopiolla on omat asetuksensa.
+
+## Päivitys jatkossa
+
+Repo on julkinen, ja skriptissä on `@updateURL`/`@downloadURL` osoittamassa GitHubin raw-tiedostoon. Kun uusi versio on pushattu `main`-haaraan:
+
+- Violentmonkey tarkistaa päivitykset itse ajoittain (oletuksena n. kerran vuorokaudessa), sekä koneella että Androidilla — ei vaadi mitään, jos ehtii odottaa.
+- Pakota tarkistus heti: Violentmonkey-kojelauta → skriptin kohdalla **Tarkista päivitykset** (koneella ja puhelimella sama painike).
+- Vaihtoehto ilman kojelautaa: avaa puhelimella/koneella suoraan `https://raw.githubusercontent.com/tatu-puu/reddit-subfilter/main/reddit-subfilter.user.js` Firefoxissa — Violentmonkey tunnistaa `.user.js`-tiedoston ja tarjoaa "Päivitä"-dialogin, koska `@namespace`+`@name` täsmää olemassa olevaan skriptiin.
+
+Versionumeroa (`@version`) pitää nostaa jokaisessa muutoksessa, muuten Violentmonkey ei näe uutta versiota päivityksenä.
 
 ## Synkkaus
 
@@ -43,6 +54,7 @@ Nykyinen versio: **1.7.1**, tiedosto `reddit-subfilter.user.js`.
 - **Asetukset sivulla eikä prompt-ikkunoissa:** `prompt()` ei toiminut Android-Firefoxissa.
 - **Synkkaus jonottaa muutokset** (`pendingAdd`/`pendingRemove`) ja yhdistää ne wikin listaan. Jos kaksi laitetta muokkaa yhtä aikaa, Reddit palauttaa 409-vastauksen ja skripti yrittää uudelleen. Puuttuva wikisivu ei tyhjennä paikallista listaa.
 - **Mainosselektorit:** `shreddit-ad-post`, `shreddit-comments-page-ad`, `shreddit-comment-tree-ad`, `shreddit-sidebar-ad` ja old.redditin `.promoted`-luokat. Näitä ei ole tarkistettu oikealta Redditiltä, joten ne voivat vaatia päivitystä.
+- **"Avaa sovelluksessa" -popupin selektorit** (`#xpromo-bottom-sheet`, `[id^="xpromo-"]`, `.rpl-bottom-sheet`, luokat `rpl-scroll-lock`/`scroll-disabled`/`m-blurred`) ovat peräisin [uBlockOrigin/uAssets-issuesta #32706](https://github.com/uBlockOrigin/uAssets/issues/32706), ei omasta havainnosta — selaimen reddit.com-automaatio oli estetty, joten koodia ei päästy testaamaan oikealla sivulla. Reddit A/B-testaa popupia, joten selektorit voivat muuttua.
 
 ## Versiohistoria
 
@@ -57,9 +69,9 @@ Nykyinen versio: **1.7.1**, tiedosto `reddit-subfilter.user.js`.
 | 1.6 | Korjaus: syöte ei enää pysähdy |
 | 1.7 | Mainosten piilotus |
 | 1.7.1 | Korjaus: wikiin kirjoitus 404 (www.reddit.com ei tunne vanhaa wiki-rajapintaa → varareitti old.redditiin) |
+| 1.8.0 | "Avaa sovelluksessa" -popupin ja scroll-lukituksen poisto |
 
 ## Jatkoideoita
 
-- Päivitysosoite (`@updateURL`) GitHubiin, jotta Violentmonkey päivittää skriptin itse.
 - Piilotus myös hakutuloksista ja suosituksista.
 - Avainsanasuodatus postausten otsikoista.
