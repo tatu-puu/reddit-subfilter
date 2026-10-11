@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Reddit Subfilter
 // @namespace    tatu.reddit-subfilter
-// @version      1.8.3
+// @version      1.8.4
 // @description  Piilota subredditit yhdellä napautuksella. Estolista synkronoituu laitteiden välillä oman yksityisen subredditin wikisivun kautta.
 // @match        https://www.reddit.com/*
 // @match        https://reddit.com/*
@@ -350,7 +350,7 @@
 
     /* "Avaa sovelluksessa" -popup: Reddit lukitsee scrollauksen sen alla, siksi overflow pakotetaan auki */
     #xpromo-bottom-sheet, [id^="xpromo-"], .rpl-bottom-sheet { display: none !important; }
-    body.rpl-scroll-lock, body.scroll-disabled, html.rpl-scroll-lock, html.scroll-disabled { overflow: auto !important; }
+    body.rpl-scroll-lock, html.rpl-scroll-lock { overflow: auto !important; }
   `;
   const addStyle = () => {
     if (document.getElementById('rsf-style')) return;
@@ -650,9 +650,16 @@
   // Reddit näyttää ajoittain koko ruudun popupin, joka kehottaa avaamaan sovelluksen, ja lukitsee
   // samalla scrollauksen luokalla bodyssa/htmlissa. Popup itse piilotetaan CSS:llä (yllä), mutta
   // lukitusluokat pitää myös poistaa, koska Reddit tarkistaa ja lisää niitä JS:llä uudelleen.
-  const SCROLL_LOCK_CLASSES = ['rpl-scroll-lock', 'scroll-disabled', 'm-blurred'];
+  // Luokkia poistetaan VAIN silloin kun popup-elementti oikeasti löytyi ja poistettiin, ei joka
+  // process()-kierroksella: "scroll-disabled" on niin yleinen nimi, että Reddit saattaa käyttää
+  // samaa luokkaa myös syötteen oman lisälatauksen tilanhallinnassa, ja jatkuva riisuminen
+  // sotki sen pysyvästi jumiin (havaittu 1.8.0–1.8.3: feedin lataus pysähtyi kokonaan Android
+  // Firefoxilla, korjautui kun Violentmonkey laitettiin pois päältä).
+  const SCROLL_LOCK_CLASSES = ['rpl-scroll-lock', 'm-blurred'];
   function removeAppPromo(root = document) {
-    root.querySelectorAll('#xpromo-bottom-sheet, [id^="xpromo-"], .rpl-bottom-sheet').forEach((el) => el.remove());
+    const popup = root.querySelectorAll('#xpromo-bottom-sheet, [id^="xpromo-"], .rpl-bottom-sheet');
+    if (!popup.length) return;
+    popup.forEach((el) => el.remove());
     document.body?.classList.remove(...SCROLL_LOCK_CLASSES);
     document.documentElement?.classList.remove(...SCROLL_LOCK_CLASSES);
   }
