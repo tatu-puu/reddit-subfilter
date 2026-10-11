@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Reddit Subfilter
 // @namespace    tatu.reddit-subfilter
-// @version      1.8.1
+// @version      1.8.2
 // @description  Piilota subredditit yhdellä napautuksella. Estolista synkronoituu laitteiden välillä oman yksityisen subredditin wikisivun kautta.
 // @match        https://www.reddit.com/*
 // @match        https://reddit.com/*
@@ -20,6 +20,8 @@
 
 (function () {
   'use strict';
+
+  const SCRIPT_VERSION = typeof GM_info !== 'undefined' ? GM_info.script.version : '?';
 
   // ---------- Estolista ----------
   const KEY = 'blockedSubs';
@@ -222,7 +224,7 @@
   async function diagnose() {
     const lines = [];
     const add = (s) => { lines.push(s); showDiag(lines); };
-    add(`Versio: ${typeof GM_info !== 'undefined' ? GM_info.script.version : '?'} · ${typeof GM_info !== 'undefined' ? GM_info.scriptHandler + ' ' + GM_info.version : ''}`);
+    add(`Versio: ${SCRIPT_VERSION} · ${typeof GM_info !== 'undefined' ? GM_info.scriptHandler + ' ' + GM_info.version : ''}`);
     add(`Sivu: ${location.origin}`);
     add(`Synkkaus-subreddit: ${syncSub ? 'r/' + syncSub : 'EI ASETETTU – Asetukset → Synkkaus-subreddit'}`);
     add(`Paikallisesti estettyjä: ${blocked.size} · jonossa +${pendingAdd.size} / −${pendingRemove.size}`);
@@ -550,7 +552,7 @@
     head.className = 'rsf-head';
     head.dataset.act = 'toggle';
     head.textContent = panelOpen ? `Piilotettu ${sessionSum}  ▾` : `Piilotettu ${sessionSum}`;
-    head.title = panelOpen ? 'Pienennä' : 'Näytä erittely';
+    head.title = (panelOpen ? 'Pienennä' : 'Näytä erittely') + ` · v${SCRIPT_VERSION}`;
     if (syncSub && lastSyncError) {
       const dot = document.createElement('span');
       dot.className = 'rsf-dot';
@@ -566,6 +568,7 @@
     else if (lastSyncOk) status.textContent = `Synkattu r/${syncSub} klo ${lastSyncOk.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' })}`;
     else status.textContent = `Synkataan r/${syncSub}…`;
     if (hideAds) status.textContent += ` · mainoksia piilotettu ${adCount}`;
+    status.textContent += ` · v${SCRIPT_VERSION}`;
     dyn.appendChild(status);
 
     const tabs = document.createElement('div');

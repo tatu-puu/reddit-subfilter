@@ -2,7 +2,7 @@
 
 Userscript, joka piilottaa ei-toivotut subredditit ja mainokset Redditistä. Toimii koneella (Chrome/Firefox) ja Androidilla (Firefox) Violentmonkeyn kautta. Estolista synkronoituu laitteiden välillä oman yksityisen subredditin wikisivun kautta.
 
-Nykyinen versio: **1.8.1**, tiedosto `reddit-subfilter.user.js`.
+Nykyinen versio: **1.8.2**, tiedosto `reddit-subfilter.user.js`.
 
 ## Ominaisuudet
 
@@ -71,6 +71,7 @@ Versionumeroa (`@version`) pitää nostaa jokaisessa muutoksessa, muuten Violent
 | 1.7.1 | Korjaus: wikiin kirjoitus 404 (www.reddit.com ei tunne vanhaa wiki-rajapintaa → varareitti old.redditiin) |
 | 1.8.0 | "Avaa sovelluksessa" -popupin ja scroll-lukituksen poisto |
 | 1.8.1 | Korjaus: syöte saattoi pysähtyä, jos viimeinen latautunut postaus oli piilotettu (litistetyn postauksen korkeus 0px → 1px, jotta IntersectionObserver rekisteröi sen) |
+| 1.8.2 | Versionumero näkyviin paneeliin (otsikon tooltip + statusrivi), jotta näkee suoraan onko puhelimella uusin versio käytössä |
 
 ## Jatkoideoita
 
