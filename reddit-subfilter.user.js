@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Reddit Subfilter
 // @namespace    tatu.reddit-subfilter
-// @version      1.8.4
+// @version      1.8.5
 // @description  Piilota subredditit yhdellä napautuksella. Estolista synkronoituu laitteiden välillä oman yksityisen subredditin wikisivun kautta.
 // @match        https://www.reddit.com/*
 // @match        https://reddit.com/*
@@ -349,7 +349,7 @@
     .rsf-toast button { background: none; border: none; color: #7ab8ff; font: 700 14px sans-serif; cursor: pointer; }
 
     /* "Avaa sovelluksessa" -popup: Reddit lukitsee scrollauksen sen alla, siksi overflow pakotetaan auki */
-    #xpromo-bottom-sheet, [id^="xpromo-"], .rpl-bottom-sheet { display: none !important; }
+    #xpromo-bottom-sheet, .rpl-bottom-sheet { display: none !important; }
     body.rpl-scroll-lock, html.rpl-scroll-lock { overflow: auto !important; }
   `;
   const addStyle = () => {
@@ -648,18 +648,16 @@
 
   // ---------- "Avaa sovelluksessa" -popup ----------
   // Reddit näyttää ajoittain koko ruudun popupin, joka kehottaa avaamaan sovelluksen, ja lukitsee
-  // samalla scrollauksen luokalla bodyssa/htmlissa. Popup itse piilotetaan CSS:llä (yllä), mutta
-  // lukitusluokat pitää myös poistaa, koska Reddit tarkistaa ja lisää niitä JS:llä uudelleen.
-  // Luokkia poistetaan VAIN silloin kun popup-elementti oikeasti löytyi ja poistettiin, ei joka
-  // process()-kierroksella: "scroll-disabled" on niin yleinen nimi, että Reddit saattaa käyttää
-  // samaa luokkaa myös syötteen oman lisälatauksen tilanhallinnassa, ja jatkuva riisuminen
-  // sotki sen pysyvästi jumiin (havaittu 1.8.0–1.8.3: feedin lataus pysähtyi kokonaan Android
-  // Firefoxilla, korjautui kun Violentmonkey laitettiin pois päältä).
+  // samalla scrollauksen luokalla bodyssa/htmlissa. Popup piilotetaan pelkällä CSS:llä (yllä) —
+  // EI poisteta DOMista (.remove()) eikä käytetä laajaa [id^="xpromo-"]-jokerimerkkiä: molemmat
+  // osoittautuivat vaarallisiksi, koska Redditin oman syötteen lisälatauksen "sentinel"-elementti
+  // saattaa jakaa saman id-etuliitteen, ja sen piilottaminen/poistaminen pysäytti latauksen
+  // pysyvästi (havaittu 1.8.0–1.8.4, vahvistettu A/B-kokeilla: Violentmonkey pois → lataus toimii).
+  // Vain tunnetut täsmälliset popup-tunnisteet kelpaavat, ja luokat riisutaan vain silloin kun
+  // popup oikeasti on läsnä, ei joka process()-kierroksella.
   const SCROLL_LOCK_CLASSES = ['rpl-scroll-lock', 'm-blurred'];
-  function removeAppPromo(root = document) {
-    const popup = root.querySelectorAll('#xpromo-bottom-sheet, [id^="xpromo-"], .rpl-bottom-sheet');
-    if (!popup.length) return;
-    popup.forEach((el) => el.remove());
+  function removeAppPromo() {
+    if (!document.querySelector('#xpromo-bottom-sheet, .rpl-bottom-sheet')) return;
     document.body?.classList.remove(...SCROLL_LOCK_CLASSES);
     document.documentElement?.classList.remove(...SCROLL_LOCK_CLASSES);
   }
@@ -685,7 +683,7 @@
   }
 
   function process(root = document) {
-    removeAppPromo(root);
+    removeAppPromo();
     processAds(root);
     // Sivukohtainen poikkeus: jos avaat suoraan estetyn subin, sitä ei piiloteta
     const here = location.pathname.match(/^\/r\/([^/]+)/);
