@@ -2,7 +2,7 @@
 
 Userscript, joka piilottaa ei-toivotut subredditit ja mainokset Redditistä. Toimii koneella (Chrome/Firefox) ja Androidilla (Firefox) Violentmonkeyn kautta. Estolista synkronoituu laitteiden välillä oman yksityisen subredditin wikisivun kautta.
 
-Nykyinen versio: **1.8.0**, tiedosto `reddit-subfilter.user.js`.
+Nykyinen versio: **1.8.1**, tiedosto `reddit-subfilter.user.js`.
 
 ## Ominaisuudet
 
@@ -50,7 +50,7 @@ Versionumeroa (`@version`) pitää nostaa jokaisessa muutoksessa, muuten Violent
 - **Postausten tunnistus:**
   - Uusi Reddit ja mobiili: `shreddit-post[subreddit-prefixed-name]`, kääreenä `article`.
   - old.reddit: `.thing.link[data-subreddit]`.
-- **Piilotus:** postaus litistetään 0 pikselin korkuiseksi eikä sille käytetä `display: none` -tyyliä. Redditin loputon scrollaus lataa lisää vasta, kun loppupään postaus tulee näkyviin, joten `display: none` pysäytti syötteen.
+- **Piilotus:** postaus litistetään 1 pikselin korkuiseksi eikä sille käytetä `display: none` -tyyliä. Redditin loputon scrollaus lataa lisää vasta, kun loppupään postaus tulee näkyviin, joten `display: none` pysäytti syötteen. Korkeus on 1px eikä tarkalleen 0, koska 0-pinta-alainen laatikko ei rekisteröidy IntersectionObserverille näkyväksi (ks. 1.8.1).
 - **Asetukset sivulla eikä prompt-ikkunoissa:** `prompt()` ei toiminut Android-Firefoxissa.
 - **Synkkaus jonottaa muutokset** (`pendingAdd`/`pendingRemove`) ja yhdistää ne wikin listaan. Jos kaksi laitetta muokkaa yhtä aikaa, Reddit palauttaa 409-vastauksen ja skripti yrittää uudelleen. Puuttuva wikisivu ei tyhjennä paikallista listaa.
 - **Mainosselektorit:** `shreddit-ad-post`, `shreddit-comments-page-ad`, `shreddit-comment-tree-ad`, `shreddit-sidebar-ad` ja old.redditin `.promoted`-luokat. Näitä ei ole tarkistettu oikealta Redditiltä, joten ne voivat vaatia päivitystä.
@@ -70,6 +70,7 @@ Versionumeroa (`@version`) pitää nostaa jokaisessa muutoksessa, muuten Violent
 | 1.7 | Mainosten piilotus |
 | 1.7.1 | Korjaus: wikiin kirjoitus 404 (www.reddit.com ei tunne vanhaa wiki-rajapintaa → varareitti old.redditiin) |
 | 1.8.0 | "Avaa sovelluksessa" -popupin ja scroll-lukituksen poisto |
+| 1.8.1 | Korjaus: syöte saattoi pysähtyä, jos viimeinen latautunut postaus oli piilotettu (litistetyn postauksen korkeus 0px → 1px, jotta IntersectionObserver rekisteröi sen) |
 
 ## Jatkoideoita
 

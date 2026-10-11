@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Reddit Subfilter
 // @namespace    tatu.reddit-subfilter
-// @version      1.8.0
+// @version      1.8.1
 // @description  Piilota subredditit yhdellä napautuksella. Estolista synkronoituu laitteiden välillä oman yksityisen subredditin wikisivun kautta.
 // @match        https://www.reddit.com/*
 // @match        https://reddit.com/*
@@ -272,11 +272,13 @@
 
   // ---------- Tyylit ----------
   const css = `
-    /* Piilotettu postaus litistetään 0 pikselin korkuiseksi eikä poisteta näkyvistä display:nonella.
+    /* Piilotettu postaus litistetään (lähes) 0 pikselin korkuiseksi eikä poisteta näkyvistä display:nonella.
        Reddit lataa lisää postauksia, kun syötteen loppupään postaus tulee näkyviin; display:none-postaus
-       ei tule koskaan näkyviin, jolloin lataus pysähtyi. */
+       ei tule koskaan näkyviin, jolloin lataus pysähtyi. Korkeus on 1px eikä tarkalleen 0, koska Redditin
+       IntersectionObserver laskee näkyvyyden pinta-alana: 0-pinta-alainen laatikko ei koskaan rekisteröidy
+       näkyväksi, jolloin lataus pysähtyi silti, jos viimeinen latautunut postaus sattui olemaan piilotettu. */
     .rsf-hidden {
-      display: block !important; height: 0 !important; min-height: 0 !important; max-height: 0 !important;
+      display: block !important; height: 1px !important; min-height: 1px !important; max-height: 1px !important;
       margin: 0 !important; padding: 0 !important; border: 0 !important;
       overflow: hidden !important; visibility: hidden !important; pointer-events: none !important;
     }
