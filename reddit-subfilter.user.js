@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Reddit Subfilter
 // @namespace    tatu.reddit-subfilter
-// @version      1.8.2
+// @version      1.8.3
 // @description  Piilota subredditit yhdellä napautuksella. Estolista synkronoituu laitteiden välillä oman yksityisen subredditin wikisivun kautta.
 // @match        https://www.reddit.com/*
 // @match        https://reddit.com/*
@@ -293,6 +293,7 @@
       padding: 0; text-align: center;
     }
     .rsf-btn:hover { opacity: 1; background: #e5484d; color: #fff; }
+    .rsf-spacer { display: block; width: 1px; pointer-events: none; }
     .rsf-toast {
       position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
       z-index: 99999; background: #222; color: #fff; border-radius: 8px;
@@ -656,6 +657,26 @@
     document.documentElement?.classList.remove(...SCROLL_LOCK_CLASSES);
   }
 
+  // ---------- Scroll-tyhjiön esto ----------
+  // Jos suodatus piilottaa niin suuren osan ladatusta syötteestä, että sivu mahtuisi kokonaan
+  // yhteen ruutuun, selaimessa ei ole enää mitään scrollattavaa – eikä Reddit silloin saa
+  // signaalia ladata lisää postauksia, ja syöte näyttää pysähtyvän. Pidetään sivu aina vähintään
+  // ruutua korkeampana näkymättömällä tilantäytteellä, jotta scrollaus (ja siis lataus) jatkuu.
+  let spacer = null;
+  function ensureScrollRoom() {
+    if (!document.body) return;
+    if (!spacer || !spacer.isConnected) {
+      spacer = document.querySelector('.rsf-spacer') || document.createElement('div');
+      spacer.className = 'rsf-spacer';
+      document.body.appendChild(spacer);
+    }
+    const spacerH = spacer.offsetHeight;
+    const contentH = document.documentElement.scrollHeight - spacerH;
+    const needed = Math.max(0, Math.ceil(window.innerHeight * 1.3) - contentH);
+    const rounded = Math.ceil(needed / 20) * 20;
+    if (Math.abs(rounded - spacerH) >= 20) spacer.style.height = rounded + 'px';
+  }
+
   function process(root = document) {
     removeAppPromo(root);
     processAds(root);
@@ -671,6 +692,7 @@
         addButton(post);
       }
     }
+    ensureScrollRoom();
   }
 
   function blockSub(sub) {

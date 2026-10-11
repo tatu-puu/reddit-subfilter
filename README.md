@@ -2,7 +2,7 @@
 
 Userscript, joka piilottaa ei-toivotut subredditit ja mainokset Redditistä. Toimii koneella (Chrome/Firefox) ja Androidilla (Firefox) Violentmonkeyn kautta. Estolista synkronoituu laitteiden välillä oman yksityisen subredditin wikisivun kautta.
 
-Nykyinen versio: **1.8.2**, tiedosto `reddit-subfilter.user.js`.
+Nykyinen versio: **1.8.3**, tiedosto `reddit-subfilter.user.js`.
 
 ## Ominaisuudet
 
@@ -54,6 +54,7 @@ Versionumeroa (`@version`) pitää nostaa jokaisessa muutoksessa, muuten Violent
 - **Asetukset sivulla eikä prompt-ikkunoissa:** `prompt()` ei toiminut Android-Firefoxissa.
 - **Synkkaus jonottaa muutokset** (`pendingAdd`/`pendingRemove`) ja yhdistää ne wikin listaan. Jos kaksi laitetta muokkaa yhtä aikaa, Reddit palauttaa 409-vastauksen ja skripti yrittää uudelleen. Puuttuva wikisivu ei tyhjennä paikallista listaa.
 - **Mainosselektorit:** `shreddit-ad-post`, `shreddit-comments-page-ad`, `shreddit-comment-tree-ad`, `shreddit-sidebar-ad` ja old.redditin `.promoted`-luokat. Näitä ei ole tarkistettu oikealta Redditiltä, joten ne voivat vaatia päivitystä.
+- **Scroll-tyhjiö (1.8.3):** Android Firefoxilla syöte pysähtyi pysyvästi, koska piilotettujen postausten litistys (1px per postaus) teki sivusta lyhyemmän kuin näytön korkeus (mitattu: `scrollHeight` 914px vs. `innerHeight` 918px, 27/28 postausta piilossa) – silloin selaimella ei ollut mitään scrollattavaa, eikä Reddit saanut signaalia ladata lisää. Koneella näyttö on isompi, niin tilanne on harvinaisempi. Korjaus: `.rsf-spacer`-elementti sivun lopussa pitää sivun aina ~1.3x näytön korkuisena.
 - **"Avaa sovelluksessa" -popupin selektorit** (`#xpromo-bottom-sheet`, `[id^="xpromo-"]`, `.rpl-bottom-sheet`, luokat `rpl-scroll-lock`/`scroll-disabled`/`m-blurred`) ovat peräisin [uBlockOrigin/uAssets-issuesta #32706](https://github.com/uBlockOrigin/uAssets/issues/32706), ei omasta havainnosta — selaimen reddit.com-automaatio oli estetty, joten koodia ei päästy testaamaan oikealla sivulla. Reddit A/B-testaa popupia, joten selektorit voivat muuttua.
 
 ## Versiohistoria
@@ -72,6 +73,7 @@ Versionumeroa (`@version`) pitää nostaa jokaisessa muutoksessa, muuten Violent
 | 1.8.0 | "Avaa sovelluksessa" -popupin ja scroll-lukituksen poisto |
 | 1.8.1 | Korjaus: syöte saattoi pysähtyä, jos viimeinen latautunut postaus oli piilotettu (litistetyn postauksen korkeus 0px → 1px, jotta IntersectionObserver rekisteröi sen) |
 | 1.8.2 | Versionumero näkyviin paneeliin (otsikon tooltip + statusrivi), jotta näkee suoraan onko puhelimella uusin versio käytössä |
+| 1.8.3 | Korjaus: syöte pysähtyi pysyvästi Android Firefoxilla, kun suodatus piilotti niin ison osan sivusta, että se mahtui yhteen ruutuun eikä mitään jäänyt scrollattavaksi (näkymätön tilantäyte pitää sivun aina ruutua korkeampana) |
 
 ## Jatkoideoita
 
